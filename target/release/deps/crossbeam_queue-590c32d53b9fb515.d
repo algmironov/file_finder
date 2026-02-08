@@ -1,9 +1,0 @@
-C:\Users\algmi\source\Rust\FileFinder\target\release\deps\crossbeam_queue-590c32d53b9fb515.d: C:\Users\algmi\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\crossbeam-queue-0.3.12\src\lib.rs C:\Users\algmi\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\crossbeam-queue-0.3.12\src\array_queue.rs C:\Users\algmi\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\crossbeam-queue-0.3.12\src\seg_queue.rs
-
-C:\Users\algmi\source\Rust\FileFinder\target\release\deps\libcrossbeam_queue-590c32d53b9fb515.rlib: C:\Users\algmi\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\crossbeam-queue-0.3.12\src\lib.rs C:\Users\algmi\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\crossbeam-queue-0.3.12\src\array_queue.rs C:\Users\algmi\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\crossbeam-queue-0.3.12\src\seg_queue.rs
-
-C:\Users\algmi\source\Rust\FileFinder\target\release\deps\libcrossbeam_queue-590c32d53b9fb515.rmeta: C:\Users\algmi\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\crossbeam-queue-0.3.12\src\lib.rs C:\Users\algmi\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\crossbeam-queue-0.3.12\src\array_queue.rs C:\Users\algmi\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\crossbeam-queue-0.3.12\src\seg_queue.rs
-
-C:\Users\algmi\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\crossbeam-queue-0.3.12\src\lib.rs:
-C:\Users\algmi\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\crossbeam-queue-0.3.12\src\array_queue.rs:
-C:\Users\algmi\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\crossbeam-queue-0.3.12\src\seg_queue.rs:

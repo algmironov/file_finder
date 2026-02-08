@@ -1,1 +1,0 @@
-C:\Users\algmi\source\Rust\FileFinder\target\release\libfile_finder.rlib: C:\Users\algmi\source\Rust\FileFinder\src\lib.rs C:\Users\algmi\source\Rust\FileFinder\src\models\mod.rs C:\Users\algmi\source\Rust\FileFinder\src\scanner\mod.rs C:\Users\algmi\source\Rust\FileFinder\src\ui\mod.rs C:\Users\algmi\source\Rust\FileFinder\src\utils\mod.rs
