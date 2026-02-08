@@ -4,7 +4,6 @@ use anyhow::Result;
 use colored::*;
 use dialoguer::{theme::ColorfulTheme, MultiSelect, Select};
 
-/// Interactive drive selection
 pub fn select_drives(available_drives: Vec<String>) -> Result<Vec<String>> {
     if available_drives.is_empty() {
         anyhow::bail!("No available drives found");
@@ -30,13 +29,11 @@ pub fn select_drives(available_drives: Vec<String>) -> Result<Vec<String>> {
     Ok(selected_drives)
 }
 
-/// Displays files with pagination
 pub fn display_files_paginated(
     files: &[FileInfo],
     page_size: usize,
     extension_filter: Option<&str>,
 ) -> Result<()> {
-    // Фильтруем файлы если указан фильтр
     let filtered_files: Vec<&FileInfo> = if let Some(ext) = extension_filter {
         files
             .iter()
@@ -55,14 +52,12 @@ pub fn display_files_paginated(
     let mut current_page = 0;
 
     loop {
-        // Clear screen (cross-platform)
         print!("\x1B[2J\x1B[1;1H");
 
         let start = current_page * page_size;
         let end = std::cmp::min(start + page_size, filtered_files.len());
         let page_files = &filtered_files[start..end];
 
-        // Header
         println!("\n{}", "=".repeat(100).bright_cyan());
         println!(
             "{}",
@@ -80,7 +75,6 @@ pub fn display_files_paginated(
         }
         println!("{}", "=".repeat(100).bright_cyan());
 
-        // Table header
         println!(
             "{:<4} {:<4} {:<50} {:<15} {}",
             "#".bold(),
@@ -97,7 +91,6 @@ pub fn display_files_paginated(
             let size = utils::format_size(file.size);
             let parent = file.parent_dir();
 
-            // Обрезаем длинные имена
             let display_name = if file_name.len() > 47 {
                 format!("{}...", &file_name[..44])
             } else {
@@ -122,7 +115,6 @@ pub fn display_files_paginated(
 
         println!("\n{}", "=".repeat(100).bright_cyan());
 
-        // Navigation menu
         let mut options = vec!["Select file for actions"];
         
         let prev_page_idx = if current_page > 0 {
@@ -154,9 +146,7 @@ pub fn display_files_paginated(
             .default(0)
             .interact()?;
 
-        // Handle selection by index
         if choice == 0 {
-            // Select file for actions
             let file_options: Vec<String> = page_files
                 .iter()
                 .map(|f| {
@@ -193,7 +183,6 @@ pub fn display_files_paginated(
     Ok(())
 }
 
-/// File action menu
 fn file_action_menu(file: &FileInfo) -> Result<()> {
     println!("\n{}", "=== File Information ===".bright_cyan().bold());
     println!("Name: {}", file.file_name().bright_white());
@@ -220,7 +209,6 @@ fn file_action_menu(file: &FileInfo) -> Result<()> {
 
     match choice {
         0 => {
-            // Open location
             match utils::open_file_location(&file.path) {
                 Ok(_) => println!("{}", "✓ Explorer opened".green()),
                 Err(e) => println!("{}", format!("✗ Error: {}", e).red()),
@@ -228,7 +216,6 @@ fn file_action_menu(file: &FileInfo) -> Result<()> {
             std::thread::sleep(std::time::Duration::from_secs(2));
         }
         1 => {
-            // Delete file
             println!(
                 "{}",
                 format!("Are you sure you want to delete '{}'?", file.file_name())
@@ -250,7 +237,6 @@ fn file_action_menu(file: &FileInfo) -> Result<()> {
             }
         }
         2 => {
-            // Show details
             println!("\n{}", "=== Detailed Information ===".bright_cyan().bold());
             println!("Full path: {}", file.path.display());
             println!("Size (bytes): {}", file.size);
@@ -269,7 +255,6 @@ fn file_action_menu(file: &FileInfo) -> Result<()> {
     Ok(())
 }
 
-/// Displays duplicate groups
 pub fn display_duplicates(duplicate_groups: Vec<Vec<FileInfo>>) -> Result<()> {
     if duplicate_groups.is_empty() {
         println!("{}", "✓ No duplicates found!".green().bold());
@@ -306,7 +291,6 @@ pub fn display_duplicates(duplicate_groups: Vec<Vec<FileInfo>>) -> Result<()> {
             );
         }
 
-        // Ask if user wants to delete duplicates
         if group.len() > 1 {
             let delete = dialoguer::Confirm::with_theme(&ColorfulTheme::default())
                 .with_prompt("Delete duplicates (keep first)?")

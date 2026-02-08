@@ -8,61 +8,46 @@ use clap::Parser;
 use colored::*;
 use std::path::PathBuf;
 
-/// Утилита для быстрого поиска больших файлов на Windows
 #[derive(Parser, Debug)]
 #[command(name = "FileFinder")]
-#[command(author = "Your Name")]
+#[command(author = "Alexey algmironov Mironov")]
 #[command(version = "1.0")]
-#[command(about = "Быстрый поиск больших файлов с интерактивными возможностями", long_about = None)]
+#[command(about = "Fast file finder utility", long_about = None)]
 struct Args {
-    /// Минимальный размер файла (например: 100MB, 1GB)
-    /// По умолчанию: 100MB
     #[arg(short, long, default_value = "100MB")]
     min_size: String,
 
-    /// Расширения файлов для фильтрации (например: mp4,mkv,avi)
-    /// Можно указать несколько через запятую
     #[arg(short, long, value_delimiter = ',')]
     extensions: Option<Vec<String>>,
 
-    /// Пути для сканирования (если не указаны, будет интерактивный выбор дисков)
     #[arg(short, long)]
     paths: Option<Vec<String>>,
 
-    /// Сохранить результаты в JSON файл
     #[arg(short, long)]
     output: Option<PathBuf>,
 
-    /// Загрузить ранее сохраненные результаты
     #[arg(short, long)]
     load: Option<PathBuf>,
 
-    /// Найти дубликаты файлов (по SHA-256 хешу)
     #[arg(short, long)]
     duplicates: bool,
 
-    /// Количество файлов на странице при просмотре
     #[arg(long, default_value = "20")]
     page_size: usize,
 
-    /// Не показывать интерактивное меню после сканирования
     #[arg(long)]
     no_interactive: bool,
 }
 
 fn main() -> Result<()> {
-    // Parse command line arguments
     let args = Args::parse();
 
-    // Print banner
     print_banner();
 
-    // If loading results from file
     if let Some(load_path) = args.load {
         return load_and_display_results(load_path, args.page_size, args.no_interactive);
     }
 
-    // Parse minimum size
     let min_size_bytes = utils::parse_size_string(&args.min_size)?;
 
     println!(
@@ -71,11 +56,9 @@ fn main() -> Result<()> {
             .bright_green()
     );
 
-    // Get paths to scan
     let paths = if let Some(p) = args.paths {
         p
     } else {
-        // Interactive drive selection
         let available_drives = utils::get_available_drives()?;
         ui::select_drives(available_drives)?
     };
@@ -89,21 +72,17 @@ fn main() -> Result<()> {
         );
     }
 
-    // Create scan configuration
     let mut config = scanner::ScanConfig::new(paths, min_size_bytes);
 
     if let Some(extensions) = args.extensions.clone() {
         config = config.with_extensions(extensions);
     }
 
-    // Start scanning
     println!("\n{}", "Starting scan...".bright_cyan().bold());
     let mut results = scanner::scan_files(config)?;
 
-    // Print statistics
     print_statistics(&results);
 
-    // Find duplicates if flag is set
     if args.duplicates && !results.files.is_empty() {
         println!(
             "\n{}",
@@ -113,12 +92,10 @@ fn main() -> Result<()> {
         ui::display_duplicates(duplicate_groups)?;
     }
 
-    // Save results
     if let Some(output_path) = args.output {
         save_results(&results, &output_path)?;
     }
 
-    // Interactive mode
     if !args.no_interactive && !results.files.is_empty() {
         println!("\n{}", "=== Interactive Mode ===".bright_cyan().bold());
         ui::display_files_paginated(&results.files, args.page_size, None)?;
@@ -129,16 +106,14 @@ fn main() -> Result<()> {
     Ok(())
 }
 
-/// Prints a nice banner
 fn print_banner() {
     println!("{}", "╔════════════════════════════════════════╗".bright_cyan());
-    println!("{}", "║      🔍 FileFinder v1.0 🔍            ║".bright_cyan().bold());
+    println!("{}", "║      🔍 FileFinder v1.0 🔍            ║".bright_cyan());
     println!("{}", "║    Fast file finder utility            ║".bright_cyan());
     println!("{}", "╚════════════════════════════════════════╝".bright_cyan());
     println!();
 }
 
-/// Prints scan statistics
 fn print_statistics(results: &models::ScanResults) {
     println!("\n{}", "=== Scan Statistics ===".bright_cyan().bold());
     println!(
@@ -163,7 +138,6 @@ fn print_statistics(results: &models::ScanResults) {
     println!("{}", "=".repeat(50).bright_cyan());
 }
 
-/// Saves results to JSON file
 fn save_results(results: &models::ScanResults, path: &PathBuf) -> Result<()> {
     let json = serde_json::to_string_pretty(results)?;
     std::fs::write(path, json)?;
@@ -176,7 +150,6 @@ fn save_results(results: &models::ScanResults, path: &PathBuf) -> Result<()> {
     Ok(())
 }
 
-/// Loads and displays previously saved results
 fn load_and_display_results(
     path: PathBuf,
     page_size: usize,

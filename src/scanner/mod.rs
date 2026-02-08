@@ -3,21 +3,15 @@ use anyhow::Result;
 use chrono::{DateTime, Local};
 use indicatif::{ProgressBar, ProgressStyle};
 use jwalk::WalkDir;
-use std::path::Path;
 use std::sync::atomic::{AtomicU64, Ordering};
 use std::sync::Arc;
 use std::time::SystemTime;
 
-/// Конфигурация для сканирования
 #[derive(Debug, Clone)]
 pub struct ScanConfig {
-    /// Пути для сканирования (диски или папки)
     pub paths: Vec<String>,
-    /// Минимальный размер файла в байтах
     pub min_size: u64,
-    /// Фильтр по расширениям (опционально)
     pub extensions: Option<Vec<String>>,
-    /// Показывать прогресс
     pub show_progress: bool,
 }
 
@@ -37,7 +31,6 @@ impl ScanConfig {
     }
 }
 
-/// Сканирует файловую систему в поиске больших файлов
 pub fn scan_files(config: ScanConfig) -> Result<ScanResults> {
     let mut results = ScanResults::new(
         config.paths.clone(),
@@ -60,32 +53,26 @@ pub fn scan_files(config: ScanConfig) -> Result<ScanResults> {
         None
     };
 
-    // Атомарные счетчики для многопоточного доступа
     let scanned_count = Arc::new(AtomicU64::new(0));
     let found_count = Arc::new(AtomicU64::new(0));
 
     let mut all_files = Vec::new();
 
-    // Scan each path
     for path in &config.paths {
         if let Some(ref pb) = progress {
             pb.set_message(format!("Scanning: {}", path));
         }
 
-        // jwalk - parallel directory traversal
-        // num_threads(8) - uses 8 threads for traversal
         let walker = WalkDir::new(path)
             .parallelism(jwalk::Parallelism::RayonNewPool(8))
-            .skip_hidden(false); // Don't skip hidden files
+            .skip_hidden(false);
 
         for entry_result in walker {
-            // Process each entry
+            
             match entry_result {
                 Ok(entry) => {
-                    // Increment scanned files counter
                     let count = scanned_count.fetch_add(1, Ordering::Relaxed);
 
-                    // Update progress every 1000 files
                     if count % 1000 == 0 {
                         if let Some(ref pb) = progress {
                             pb.set_message(format!(
@@ -97,27 +84,23 @@ pub fn scan_files(config: ScanConfig) -> Result<ScanResults> {
                         }
                     }
 
-                    // Check if it's a file, not a directory
                     if !entry.file_type().is_file() {
                         continue;
                     }
 
-                    // Получаем метаданные
                     let metadata = match entry.metadata() {
                         Ok(m) => m,
-                        Err(_) => continue, // Пропускаем файлы без доступа
+                        Err(_) => continue,
                     };
 
                     let size = metadata.len();
 
-                    // Фильтр по размеру
                     if size < config.min_size {
                         continue;
                     }
 
                     let path_buf = entry.path();
 
-                    // Фильтр по расширению
                     if let Some(ref exts) = config.extensions {
                         let ext = path_buf
                             .extension()
@@ -130,20 +113,17 @@ pub fn scan_files(config: ScanConfig) -> Result<ScanResults> {
                         }
                     }
 
-                    // Конвертируем SystemTime в DateTime
                     let modified = metadata
                         .modified()
                         .ok()
                         .and_then(|t| system_time_to_datetime(t))
                         .unwrap_or_else(|| Local::now());
 
-                    // Создаем FileInfo
                     let file_info = FileInfo::new(path_buf, size, modified);
                     all_files.push(file_info);
                     found_count.fetch_add(1, Ordering::Relaxed);
                 }
                 Err(_) => {
-                    // Skip inaccessible paths (no access rights, etc.)
                     continue;
                 }
             }
@@ -158,7 +138,6 @@ pub fn scan_files(config: ScanConfig) -> Result<ScanResults> {
         ));
     }
 
-    // Sort by size (largest first)
     all_files.sort_by(|a, b| b.size.cmp(&a.size));
 
     results.files = all_files;
@@ -168,14 +147,12 @@ pub fn scan_files(config: ScanConfig) -> Result<ScanResults> {
     Ok(results)
 }
 
-/// Конвертирует SystemTime в DateTime<Local>
 fn system_time_to_datetime(system_time: SystemTime) -> Option<DateTime<Local>> {
     let duration_since_epoch = system_time.duration_since(SystemTime::UNIX_EPOCH).ok()?;
     DateTime::from_timestamp(duration_since_epoch.as_secs() as i64, 0)
         .map(|dt| dt.with_timezone(&Local))
 }
 
-/// Finds duplicate files by hash
 pub fn find_duplicates(files: &mut [FileInfo], show_progress: bool) -> Result<Vec<Vec<FileInfo>>> {
     use rayon::prelude::*;
     use std::collections::HashMap;
@@ -196,7 +173,6 @@ pub fn find_duplicates(files: &mut [FileInfo], show_progress: bool) -> Result<Ve
         None
     };
 
-    // Calculate hashes in parallel
     files.par_iter_mut().for_each(|file| {
         if let Ok(hash) = crate::utils::calculate_file_hash(&file.path) {
             file.hash = Some(hash);
@@ -221,7 +197,6 @@ pub fn find_duplicates(files: &mut [FileInfo], show_progress: bool) -> Result<Ve
         }
     }
 
-    // Group files by hash
     let mut hash_map: HashMap<String, Vec<FileInfo>> = HashMap::new();
 
     for file in files.iter() {
@@ -233,7 +208,6 @@ pub fn find_duplicates(files: &mut [FileInfo], show_progress: bool) -> Result<Ve
         }
     }
 
-    // Keep only groups with duplicates (2+ files)
     let duplicates: Vec<Vec<FileInfo>> = hash_map
         .into_iter()
         .map(|(_, files)| files)
