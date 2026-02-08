@@ -1,0 +1,11 @@
+C:\Users\algmi\source\Rust\FileFinder\target\release\deps\normpath-2bfb8b435a26ef0a.d: C:\Users\algmi\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\normpath-1.5.0\src\lib.rs C:\Users\algmi\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\normpath-1.5.0\src\base.rs C:\Users\algmi\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\normpath-1.5.0\src\cmp.rs C:\Users\algmi\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\normpath-1.5.0\src\error.rs C:\Users\algmi\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\normpath-1.5.0\src\windows\mod.rs
+
+C:\Users\algmi\source\Rust\FileFinder\target\release\deps\libnormpath-2bfb8b435a26ef0a.rlib: C:\Users\algmi\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\normpath-1.5.0\src\lib.rs C:\Users\algmi\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\normpath-1.5.0\src\base.rs C:\Users\algmi\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\normpath-1.5.0\src\cmp.rs C:\Users\algmi\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\normpath-1.5.0\src\error.rs C:\Users\algmi\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\normpath-1.5.0\src\windows\mod.rs
+
+C:\Users\algmi\source\Rust\FileFinder\target\release\deps\libnormpath-2bfb8b435a26ef0a.rmeta: C:\Users\algmi\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\normpath-1.5.0\src\lib.rs C:\Users\algmi\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\normpath-1.5.0\src\base.rs C:\Users\algmi\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\normpath-1.5.0\src\cmp.rs C:\Users\algmi\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\normpath-1.5.0\src\error.rs C:\Users\algmi\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\normpath-1.5.0\src\windows\mod.rs
+
+C:\Users\algmi\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\normpath-1.5.0\src\lib.rs:
+C:\Users\algmi\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\normpath-1.5.0\src\base.rs:
+C:\Users\algmi\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\normpath-1.5.0\src\cmp.rs:
+C:\Users\algmi\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\normpath-1.5.0\src\error.rs:
+C:\Users\algmi\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\normpath-1.5.0\src\windows\mod.rs:
