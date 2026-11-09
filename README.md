@@ -1,244 +1,117 @@
 # FileFinder 🔍
 
-Быстрая CLI утилита для поиска больших файлов на Windows с интерактивными возможностями.
+**An interactive Rust CLI for finding large files, scanning directories, and detecting duplicates on Windows.**
 
-## Особенности
+[**Русская документация / Original Russian README**](README.ru.md)
 
-✨ **Производительность**
-- Параллельное сканирование файловой системы (8 потоков)
-- Быстрая работа благодаря Rust и библиотеке jwalk
-- Способна сканировать миллионы файлов за минуты
+FileFinder helps inspect local disk usage, filter large files, and identify duplicate content. It combines a command-line interface with interactive navigation and uses Rust libraries such as `jwalk`, `rayon`, and `sha2`.
 
-🎯 **Функциональность**
-- Интерактивный выбор дисков для сканирования
-- Фильтрация по расширениям файлов
-- Поиск дубликатов по SHA-256 хешу
-- Пагинация результатов с удобной навигацией
-- Действия с файлами: открыть в проводнике, удалить
-- Сохранение и загрузка результатов сканирования
-- Прогресс-бар и статистика в реальном времени
+> **Project status:** A personal utility that is useful in practice but still needs refinement. Review results carefully before deleting any files.
 
-🎨 **Удобство**
-- Цветной интерактивный интерфейс
-- Иконки для разных типов файлов
-- Читаемое отображение размеров (KB, MB, GB)
-- Подробная информация о файлах
+## Features
 
-## Установка
+- Scan selected disks or directories with parallel traversal.
+- Filter files by minimum size and extension.
+- Identify duplicates using SHA-256 hashes.
+- Browse paginated results in an interactive terminal.
+- Open file locations, inspect details, and optionally delete selected files.
+- Save scan results to JSON and load them later.
+- Show progress and human-readable file sizes.
 
-### Предварительные требования
+Performance varies with the filesystem, storage hardware, file count, permissions, and whether hashing is enabled. No reproducible benchmarks are currently provided.
 
-1. Установите Rust с официального сайта: https://rustup.rs/
+## Requirements
 
-Для Windows, скачайте и запустите `rustup-init.exe`
+- Windows (the documented and intended platform).
+- A Rust toolchain to build from source: [rustup.rs](https://rustup.rs/).
 
-### Сборка проекта
+## Build
 
 ```bash
-# Клонируйте или скопируйте проект
+git clone https://github.com/algmironov/file_finder.git
 cd file_finder
-
-# Соберите в режиме release (оптимизированная версия)
 cargo build --release
-
-# Исполняемый файл будет в target/release/file_finder.exe
 ```
 
-## Использование
+The Windows executable is produced at `target/release/file_finder.exe`.
 
-### Базовое использование
+You can also install the locally built CLI into your Cargo binary directory:
 
 ```bash
-# Запуск с интерактивным выбором дисков
+cargo install --path .
+```
+
+## Quick start
+
+```powershell
+# Interactive disk selection
 file_finder.exe
 
-# Сканирование конкретного диска
+# Scan a specific disk
 file_finder.exe -p C:\
 
-# Указать минимальный размер файла
+# Find files larger than 500 MB
 file_finder.exe --min-size 500MB
 
-# Фильтр по расширениям
+# Filter by file extension
 file_finder.exe -e mp4,mkv,avi
 
-# Сканирование нескольких дисков
-file_finder.exe -p C:\ -p D:\
-```
-
-### Расширенные возможности
-
-```bash
-# Поиск дубликатов файлов
+# Find duplicates
 file_finder.exe --duplicates
 
-# Сохранить результаты в JSON
+# Save results
 file_finder.exe --output results.json
-
-# Загрузить ранее сохраненные результаты
-file_finder.exe --load results.json
-
-# Указать количество файлов на странице
-file_finder.exe --page-size 50
-
-# Только сканирование без интерактивного меню
-file_finder.exe --no-interactive --output results.json
 ```
 
-### Комбинированные примеры
+If the executable is not on your `PATH`, run it using its full path or from its build directory.
 
-```bash
-# Найти все видео файлы больше 1GB и найти дубликаты
-file_finder.exe --min-size 1GB -e mp4,mkv,avi --duplicates
+## CLI options
 
-# Поиск больших документов с сохранением результатов
-file_finder.exe --min-size 50MB -e pdf,docx,xlsx -o documents.json
+| Option | Short | Description |
+|---|---|---|
+| `--min-size` | `-m` | Minimum file size, such as `100MB` or `1GB` |
+| `--extensions` | `-e` | Comma-separated extension filter |
+| `--paths` | `-p` | One or more scan paths |
+| `--output` | `-o` | Save results as JSON |
+| `--load` | `-l` | Load previously saved results |
+| `--duplicates` | `-d` | Search for duplicate content |
+| `--page-size` | | Number of entries per page |
+| `--no-interactive` | | Scan without the interactive menu |
 
-# Сканирование нескольких дисков с фильтром
-file_finder.exe -p C:\ -p D:\ -p E:\ --min-size 200MB
+For example:
+
+```powershell
+# Scan two disks and find large video files
+file_finder.exe -p C:\ -p D:\ --min-size 1GB -e mp4,mkv,avi
+
+# Export document scan results without entering the interactive menu
+file_finder.exe --min-size 50MB -e pdf,docx,xlsx --no-interactive --output documents.json
+
+# Load saved results
+file_finder.exe --load documents.json
 ```
 
-## Аргументы командной строки
+## Interactive mode
 
-| Аргумент | Короткий | Описание | По умолчанию |
-|----------|----------|----------|--------------|
-| `--min-size` | `-m` | Минимальный размер файла (100MB, 1GB и т.д.) | 100MB |
-| `--extensions` | `-e` | Расширения для фильтрации (через запятую) | - |
-| `--paths` | `-p` | Пути для сканирования | Интерактивный выбор |
-| `--output` | `-o` | Сохранить результаты в JSON | - |
-| `--load` | `-l` | Загрузить результаты из JSON | - |
-| `--duplicates` | `-d` | Найти дубликаты файлов | false |
-| `--page-size` | | Файлов на странице | 20 |
-| `--no-interactive` | | Без интерактивного меню | false |
+After scanning, you can navigate through results, inspect file details, apply extension filters, open a file's location in Explorer, and perform supported file actions.
 
-## Интерактивный режим
+**Deletion warning:** Removing a file is a destructive operation. Confirm that a file is no longer needed and that any detected duplicate is genuinely safe to remove. Do not treat a matching hash as permission to delete automatically.
 
-После сканирования вы попадаете в интерактивный режим с возможностями:
+## Known limitations
 
-1. **Навигация по страницам** - просмотр результатов с пагинацией
-2. **Выбор файлов** - выбрать файл для выполнения действий
-3. **Действия с файлами**:
-   - 📂 Открыть расположение в проводнике
-   - 🗑️ Удалить файл
-   - ℹ️ Показать детальную информацию
-4. **Фильтрация** - применить фильтр по расширению
+- Some system files may be inaccessible without appropriate permissions.
+- Network drives can be substantially slower than local disks.
+- Hashing large files can take considerable time and disk I/O.
+- The tool is not yet presented as a fully tested or polished general-purpose file manager.
 
-## Распространение приложения
+## Future improvements
 
-### Создание портативной версии
+Potential improvements include more robust file operations, better diagnostics, improved distribution, and optional reporting features. These are ideas, not promises or release commitments.
 
-```bash
-# Соберите в release режиме
-cargo build --release
+## License
 
-# Исполняемый файл находится в:
-# target/release/file_finder.exe
+MIT. See the repository license file for the applicable terms.
 
-# Скопируйте файл куда угодно - никаких зависимостей не требуется!
-# Это статически скомпилированный бинарник
-```
+---
 
-### Установка в систему
-
-```bash
-# Опция 1: Установить через cargo
-cargo install --path .
-
-# Опция 2: Скопировать в PATH
-copy target\release\file_finder.exe C:\Windows\System32\
-```
-
-### Создание installer'а (опционально)
-
-Для создания Windows installer можно использовать:
-- **WiX Toolset** - для MSI пакетов
-- **Inno Setup** - для создания Setup.exe
-- **NSIS** - альтернатива Inno Setup
-
-Пример для Inno Setup (`installer.iss`):
-
-```inno
-[Setup]
-AppName=FileFinder
-AppVersion=1.0
-DefaultDirName={pf}\FileFinder
-OutputBaseFilename=FileFinder-Setup
-
-[Files]
-Source: "target\release\file_finder.exe"; DestDir: "{app}"
-
-[Icons]
-Name: "{group}\FileFinder"; Filename: "{app}\file_finder.exe"
-```
-
-## Оптимизация размера
-
-Текущий размер исполняемого файла: ~5-8 MB
-
-Для уменьшения размера можно использовать `upx` (сжатие):
-
-```bash
-# Установите UPX: https://upx.github.io/
-upx --best --lzma target\release\file_finder.exe
-
-# Размер уменьшится до ~2-3 MB
-```
-
-## Производительность
-
-На современном ПК (SSD):
-- Сканирование системного диска (500k файлов): ~30-60 секунд
-- Сканирование нескольких терабайт: ~5-10 минут
-- Поиск дубликатов (хеширование): зависит от размера файлов
-
-Оптимизации:
-- Используется 8 параллельных потоков для обхода
-- Параллельное хеширование с помощью rayon
-- Минимальные аллокации памяти
-- Release сборка с LTO (Link Time Optimization)
-
-## Известные ограничения
-
-1. **Права доступа** - некоторые системные файлы могут быть недоступны
-2. **Сетевые диски** - медленнее локальных дисков
-3. **Хеширование** - для больших файлов может занять время
-
-## Устранение неполадок
-
-### "Access Denied" ошибки
-Запустите от имени администратора для доступа к системным файлам.
-
-### Медленное сканирование
-- Проверьте, не сканируете ли сетевые диски
-- Увеличьте минимальный размер файла
-- Используйте фильтр по расширениям
-
-### Ошибки компиляции
-```bash
-# Обновите Rust до последней версии
-rustup update
-
-# Очистите кеш и пересоберите
-cargo clean
-cargo build --release
-```
-
-## Лицензия
-
-MIT License - свободно используйте в любых целях.
-
-## Поддержка
-
-При возникновении проблем:
-1. Проверьте версию Rust: `rustc --version` (должна быть 1.70+)
-2. Попробуйте пересобрать проект
-3. Проверьте права доступа к файлам
-
-## Roadmap
-
-Планируемые функции:
-- [ ] GUI версия
-- [ ] Экспорт в CSV/Excel
-- [ ] Графики и визуализация
-- [ ] Фильтрация по дате изменения
-- [ ] Поиск по содержимому файлов
-- [ ] Мониторинг изменений в реальном времени
+For the original, more detailed instructions and historical performance notes, see [README.ru.md](README.ru.md).
